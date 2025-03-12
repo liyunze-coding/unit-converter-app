@@ -6,7 +6,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -92,37 +91,34 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // on convert
-        convertButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Get text from input field
-                String inputValue = Objects.requireNonNull(sourceField.getText()).toString().trim();
+        convertButton.setOnClickListener(v -> {
+            // Get text from input field
+            String inputValue = Objects.requireNonNull(sourceField.getText()).toString().trim();
 
-                // Check if input is empty
-                if (inputValue.isEmpty()) {
-                    sourceField.setError("Enter a number");
-                    return;
-                }
-
-                double inputNum;
-                try {
-                    inputNum = Double.parseDouble(inputValue);
-                } catch (NumberFormatException e) {
-                    sourceField.setError("Invalid number");
-                    return;
-                }
-
-                // Get selected units
-                String unitType = unitSpinner.getSelectedItem().toString();
-                String fromUnit = sourceSpinner.getSelectedItem().toString();
-                String toUnit = destinationSpinner.getSelectedItem().toString();
-
-                // Call ConvertUnit and store result
-                double result = ConvertUnit.convert(inputNum, fromUnit, toUnit, unitType);
-                String resultString = result+"";
-
-                destinationField.setText(resultString);
+            // Check if input is empty
+            if (inputValue.isEmpty()) {
+                sourceField.setError("Enter a number");
+                return;
             }
+
+            double inputNum;
+            try {
+                inputNum = Double.parseDouble(inputValue);
+            } catch (NumberFormatException e) {
+                sourceField.setError("Invalid number");
+                return;
+            }
+
+            // Get selected units
+            String unitType = unitSpinner.getSelectedItem().toString();
+            String fromUnit = sourceSpinner.getSelectedItem().toString();
+            String toUnit = destinationSpinner.getSelectedItem().toString();
+
+            // Call ConvertUnit and store result
+            double result = ConvertUnit.convert(inputNum, fromUnit, toUnit, unitType);
+            String resultString = result+"";
+
+            destinationField.setText(resultString);
         });
     }
 }

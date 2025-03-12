@@ -3,7 +3,7 @@ package com.deakin.unitConverter;
 import java.util.HashMap;
 import java.util.Map;
 
-// generated using ChatGPT
+// Generated using ChatGPT
 public class ConvertUnit {
     // Conversion factors for length (relative to meters)
     private static final Map<String, Double> lengthFactors = new HashMap<>();
@@ -24,7 +24,30 @@ public class ConvertUnit {
         weightFactors.put("kg", 1.0);
         weightFactors.put("ounce", 0.0283495);
         weightFactors.put("g", 0.001);
-        weightFactors.put("ton", 907.184);
+        weightFactors.put("ton", 907.185);
+    }
+
+    // Hashmap not used for temperature
+    // because it involves multiplication/division and addition/subtraction
+    /**
+     * Converts temperature between Celsius, Fahrenheit, and Kelvin.
+     */
+    private static double convertTemperature(double value, String from, String to) {
+        switch (from) {
+            case "C":
+                if (to.equals("F")) return (value * 1.8) + 32;
+                if (to.equals("K")) return value + 273.15;
+                break;
+            case "F":
+                if (to.equals("C")) return (value - 32) / 1.8;
+                if (to.equals("K")) return ((value - 32) / 1.8) + 273.15;
+                break;
+            case "K":
+                if (to.equals("C")) return value - 273.15;
+                if (to.equals("F")) return ((value - 273.15) / 1.8) + 32;
+                break;
+        }
+        return value; // If fromUnit == toUnit
     }
 
     /**
@@ -38,36 +61,27 @@ public class ConvertUnit {
      */
     public static double convert(double value, String fromUnit, String toUnit, String unitType) {
         if (unitType.equalsIgnoreCase("length")) {
-            if (!lengthFactors.containsKey(fromUnit) || !lengthFactors.containsKey(toUnit)) {
+            Double fromFactor = lengthFactors.get(fromUnit);
+            Double toFactor = lengthFactors.get(toUnit);
+
+            if (fromFactor == null || toFactor == null) {
                 throw new IllegalArgumentException("Invalid length unit: " + fromUnit + " or " + toUnit);
             }
-            return value * lengthFactors.get(fromUnit) / lengthFactors.get(toUnit);
+
+            return value * fromFactor / toFactor;
         } else if (unitType.equalsIgnoreCase("weight")) {
-            if (!weightFactors.containsKey(fromUnit) || !weightFactors.containsKey(toUnit)) {
+            Double fromFactor = weightFactors.get(fromUnit);
+            Double toFactor = weightFactors.get(toUnit);
+
+            if (fromFactor == null || toFactor == null) {
                 throw new IllegalArgumentException("Invalid weight unit: " + fromUnit + " or " + toUnit);
             }
-            return value * weightFactors.get(fromUnit) / weightFactors.get(toUnit);
+
+            return value * fromFactor / toFactor;
         } else if (unitType.equalsIgnoreCase("temperature")) {
             return convertTemperature(value, fromUnit, toUnit);
         }
+
         throw new IllegalArgumentException("Invalid unit type: " + unitType);
-    }
-
-
-    /**
-     * Converts temperature between Celsius, Fahrenheit, and Kelvin.
-     */
-    private static double convertTemperature(double value, String from, String to) {
-        if (from.equals("C")) {
-            if (to.equals("F")) return (value * 9/5) + 32;
-            if (to.equals("K")) return value + 273.15;
-        } else if (from.equals("F")) {
-            if (to.equals("C")) return (value - 32) * 5/9;
-            if (to.equals("K")) return (value - 32) * 5/9 + 273.15;
-        } else if (from.equals("K")) {
-            if (to.equals("C")) return value - 273.15;
-            if (to.equals("F")) return (value - 273.15) * 9/5 + 32;
-        }
-        return value; // If fromUnit == toUnit
     }
 }

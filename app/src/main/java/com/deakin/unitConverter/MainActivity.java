@@ -90,6 +90,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // if source spinner is picked the same unit as destination spinner, exchange unit
+        sourceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedUnit = adapterView.getItemAtPosition(i).toString();
+                String destinationUnit = destinationSpinner.getSelectedItem().toString();
+
+                // If the selected unit in source is the same as the destination, swap them
+                if (selectedUnit.equals(destinationUnit)) {
+                    int destinationIndex = destinationSpinner.getSelectedItemPosition();
+                    destinationSpinner.setSelection(i); // Set destination to previous source
+                    sourceSpinner.setSelection(destinationIndex); // Set source to previous destination
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                // Do nothing
+            }
+        });
+
+
         // on convert
         convertButton.setOnClickListener(v -> {
             // Get text from input field

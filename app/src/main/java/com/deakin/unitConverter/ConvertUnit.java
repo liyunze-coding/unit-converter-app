@@ -2,6 +2,8 @@ package com.deakin.unitConverter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 // Generated using ChatGPT
 public class ConvertUnit {
@@ -34,17 +36,17 @@ public class ConvertUnit {
      */
     private static double convertTemperature(double value, String from, String to) {
         switch (from) {
-            case "C":
-                if (to.equals("F")) return (value * 1.8) + 32;
-                if (to.equals("K")) return value + 273.15;
+            case "Celsius":
+                if (to.equalsIgnoreCase("Fahrenheit")) return (value * 1.8) + 32;
+                if (to.equalsIgnoreCase("Kelvin")) return value + 273.15;
                 break;
-            case "F":
-                if (to.equals("C")) return (value - 32) / 1.8;
-                if (to.equals("K")) return ((value - 32) / 1.8) + 273.15;
+            case "Fahrenheit":
+                if (to.equalsIgnoreCase("Celsius")) return (value - 32) / 1.8;
+                if (to.equalsIgnoreCase("Kelvin")) return ((value - 32) / 1.8) + 273.15;
                 break;
-            case "K":
-                if (to.equals("C")) return value - 273.15;
-                if (to.equals("F")) return ((value - 273.15) / 1.8) + 32;
+            case "Kelvin":
+                if (to.equalsIgnoreCase("Celsius")) return value - 273.15;
+                if (to.equalsIgnoreCase("Fahrenheit")) return ((value - 273.15) / 1.8) + 32;
                 break;
         }
         return value; // If fromUnit == toUnit
@@ -60,6 +62,8 @@ public class ConvertUnit {
      * @return Converted value.
      */
     public static double convert(double value, String fromUnit, String toUnit, String unitType) {
+        double result;
+
         if (unitType.equalsIgnoreCase("length")) {
             Double fromFactor = lengthFactors.get(fromUnit);
             Double toFactor = lengthFactors.get(toUnit);
@@ -68,7 +72,7 @@ public class ConvertUnit {
                 throw new IllegalArgumentException("Invalid length unit: " + fromUnit + " or " + toUnit);
             }
 
-            return value * fromFactor / toFactor;
+            result = value * fromFactor / toFactor;
         } else if (unitType.equalsIgnoreCase("weight")) {
             Double fromFactor = weightFactors.get(fromUnit);
             Double toFactor = weightFactors.get(toUnit);
@@ -77,11 +81,25 @@ public class ConvertUnit {
                 throw new IllegalArgumentException("Invalid weight unit: " + fromUnit + " or " + toUnit);
             }
 
-            return value * fromFactor / toFactor;
+            result = value * fromFactor / toFactor;
         } else if (unitType.equalsIgnoreCase("temperature")) {
-            return convertTemperature(value, fromUnit, toUnit);
+            result = convertTemperature(value, fromUnit, toUnit);
+        } else {
+            throw new IllegalArgumentException("Invalid unit type: " + unitType);
         }
 
-        throw new IllegalArgumentException("Invalid unit type: " + unitType);
+        // Round to 10 decimal places
+        return roundNumbers(result);
+    }
+
+    // Helper method to round to 14 decimal places
+    private static double roundNumbers(double value) {
+        if (value == 0) {
+            return 0;
+        }
+
+        BigDecimal bd = new BigDecimal(value);
+        int scale = 10 - bd.precision() + bd.scale();
+        return bd.setScale(scale, RoundingMode.HALF_UP).doubleValue();
     }
 }

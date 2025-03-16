@@ -46,7 +46,10 @@ public class MainActivity extends AppCompatActivity {
         String[] unitCategories = {"Length", "Weight", "Temperature"};
         String[] lengthUnits = {"inch", "foot", "yard", "mile", "km", "cm", "meter"};
         String[] weightUnits = {"lbs", "kg", "ounce", "ton", "g"};
-        String[] tempUnits = {"C", "F", "K"};
+        String[] tempUnits = {"Celsius", "Fahrenheit", "Kelvin"};
+
+        // variable to store the previous index
+        final int[] sourceDestinationIndex = {0,1};
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, unitCategories);
 
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                     destinationSpinner.setAdapter(tempAdapter);
                 }
 
-                destinationSpinner.setSelection(1);
+                destinationSpinner.setSelection(sourceDestinationIndex[1]);
             }
 
             @Override
@@ -99,10 +102,30 @@ public class MainActivity extends AppCompatActivity {
 
                 // If the selected unit in source is the same as the destination, swap them
                 if (selectedUnit.equals(destinationUnit)) {
-                    int destinationIndex = destinationSpinner.getSelectedItemPosition();
-                    destinationSpinner.setSelection(i); // Set destination to previous source
-                    sourceSpinner.setSelection(destinationIndex); // Set source to previous destination
+                    destinationSpinner.setSelection(sourceDestinationIndex[0]); // Set destination to previous source
                 }
+
+                sourceDestinationIndex[0] = i;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                // Do nothing
+            }
+        });
+
+        destinationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedUnit = adapterView.getItemAtPosition(i).toString();
+                String sourceUnit = sourceSpinner.getSelectedItem().toString();
+
+                // If the selected unit in source is the same as the destination, swap them
+                if (selectedUnit.equals(sourceUnit)) {
+                    sourceSpinner.setSelection(sourceDestinationIndex[1]); // Set destination to previous source
+                }
+
+                sourceDestinationIndex[1] = i;
             }
 
             @Override
@@ -138,8 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Call ConvertUnit and store result
             double result = ConvertUnit.convert(inputNum, fromUnit, toUnit, unitType);
-            String resultString = result+"";
-
+            String resultString = result == (long) result ? String.valueOf((long) result) : String.valueOf(result);
             destinationField.setText(resultString);
         });
     }
